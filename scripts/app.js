@@ -6,6 +6,11 @@ const ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 600;
 
+const MOVE_UP = "up";
+const MOVE_DOWN = "down";
+const MOVE_RIGHT = "right";
+const MOVE_LEFT = "left";
+
 let game = {
 	gridSize: 20,
 	refreshRate: 500, // milliseconds
@@ -23,11 +28,24 @@ class Player {
 		this.y = y;
 		this.game = game;
 		this.ctx = ctx;
-		this.currentDirection = "down";
+		this.currentDirection = "MOVE_DOWN";
 		this.head = new Segment(this.x, this.y, "yellow", ctx);
 		this.segments = [];
 
 		this.lastUpdate = 0;
+		this.wireUpEvents();
+
+		switch (this.currentDirection) {
+			case "MOVE_DOWN":
+				this.head.y += this.game.gridSize;
+			case "MOVE_UP":
+				this.head.y -= this.game.gridSize;
+			case "MOVE_RIGHT":
+				this.head.y += this.game.gridSize;
+			case "MOVE_LEFT":
+				this.head.y -= this.game.gridSize;
+				break;
+		}
 	}
 
 	/**
@@ -37,13 +55,13 @@ class Player {
 		this.lastUpdate += elaspedTime;
 		if (this.lastUpdate < this.game.refreshRate)
 			switch (this.currentDirection) {
-				case "down":
+				case "MOVE_DOWN":
 					this.head.y += this.game.gridSize;
-				case "up":
+				case "MOVE_UP":
 					this.head.y -= this.game.gridSize;
-				case "right":
+				case "MOVE_RIGHT":
 					this.head.y += this.game.gridSize;
-				case "left":
+				case "MOVE_LEFT":
 					this.head.y -= this.game.gridSize;
 			}
 	}
@@ -51,6 +69,25 @@ class Player {
 	draw() {
 		this.head.draw();
 		this.segments.forEach((s) => {});
+	}
+	wireUpEvents() {
+		document.addEventListener("keydown", (e) => {
+			console.log(e.code);
+			switch (e.code) {
+				case "ArrowUp":
+					this.currentDirection = "MOVE_UP";
+					break;
+				case "ArrowDown":
+					this.currentDirection = "MOVE_DOWN";
+					break;
+				case "ArrowRight":
+					this.currentDirection = "MOVE_RIGHT";
+					break;
+				case "ArrowLeft":
+					this.currentDirection = "MOVE_LEFT";
+					break;
+			}
+		});
 	}
 }
 
