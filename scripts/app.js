@@ -118,7 +118,92 @@ class Segment {
 	}
 }
 
+// Food notes:
+// Should obey our gird restrctions
+//When you run into it ur snake grows  - randomize these
+// 	Red food + 1 segment/ Blue food + 2 segments/ Gold food + 4 segments
+// Start with circles
+// spaw in random grid
+// 	within the bounderies
+// 	only spwan on empty grid spots
+// How many food spawn?
+//	make it configurable
+// 	at least 2 per player
+
+class Food {
+	/**
+	 * @param {CanvasRenderingContext2D} ctx
+	 */
+	constructor(ctx) {
+		this.ctx = ctx;
+		this.x = 0;
+		this.y = 0;
+		this.radius = game.gridSize / 2;
+		this.color = "red";
+		this.growBy = 1;
+		this.isEaten = false;
+	}
+
+	spawn() {
+		this.isEaten = false;
+
+		let foodType = Math.floor(Math.random() * 3 + 1);
+
+		switch (foodType) {
+			case 1:
+				this.color = "red";
+				this.growBy = 1;
+			case 2:
+				this.color = "blue";
+				this.growBy = 2;
+			case 3:
+				this.color = "gold";
+				this.growBy = 4;
+				break;
+		}
+
+		let xGridMaxValue = canvas.width / game.gridSize;
+		let yGridMaxValue = canvas.height / game.gridSize;
+
+		let randomX = Math.floor(Math.random() * xGridMaxValue);
+		let randomY = Math.floor(Math.random() * yGridMaxValue);
+
+		this.x = randomX * game.gridSize;
+		this.y = randomY * game.gridSize;
+	}
+
+	update() {}
+
+	draw() {
+		if (this.isEaten) return;
+
+		this.ctx.beginPath();
+		this.ctx.fillStyle = this.color;
+		this.ctx.arc(
+			this.x + this.radius,
+			this.y + this.radius,
+			this.radius,
+			0,
+			Math.PI * 2
+		);
+		this.ctx.fill();
+		this.ctx.closePath();
+	}
+}
+
+// Other things we can run into:
+// Bomb
+// makes you faster
+
 let p1 = new Player(5 * game.gridSize, 5 * game.gridSize, ctx, game);
+
+let food = [new Food(ctx), new Food(ctx), new Food(ctx), new Food(ctx)];
+
+food.forEach((f) => {
+	f.spawn();
+});
+
+//f1.spawn();
 
 let currentTime = 0;
 
@@ -130,6 +215,10 @@ function gameLoop(timestamp) {
 
 	p1.update(elaspedTime);
 	p1.draw();
+
+	food.forEach((f) => {
+		f.draw();
+	});
 
 	requestAnimationFrame(gameLoop);
 }
