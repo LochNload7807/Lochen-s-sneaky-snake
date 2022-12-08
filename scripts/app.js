@@ -89,6 +89,12 @@ class Player {
 			}
 		});
 	}
+
+	grow(growBy) {
+		for (let i = 0; i < growBy; i++) {
+			this.segments.push(new Segment(this.x, this.y, "purple", this.ctx));
+		}
+	}
 }
 
 class Segment {
@@ -141,7 +147,7 @@ class Food {
 		this.radius = game.gridSize / 2;
 		this.color = "red";
 		this.growBy = 1;
-		this.isEaten = false;
+		this.isEaten = true;
 	}
 
 	spawn() {
@@ -199,14 +205,26 @@ let p1 = new Player(5 * game.gridSize, 5 * game.gridSize, ctx, game);
 
 let food = [new Food(ctx), new Food(ctx), new Food(ctx), new Food(ctx)];
 
-food.forEach((f) => {
-	f.spawn();
-});
-
-//f1.spawn();
+/**
+ * @param {Array<Player>} players
+ * @param {Array<Food>} food
+ */
+function checkIfFoodIsConsumed(players, food) {
+	food.forEach((f) => {
+		players.forEach((p) => {
+			if (p.x == f.x && p.y == f.y) {
+				// food is eaten
+				f.isEaten = true;
+			}
+		});
+	});
+}
 
 let currentTime = 0;
 
+/**
+ * @param {number} timestamp
+ */
 function gameLoop(timestamp) {
 	let elaspedTime = timestamp - currentTime;
 	currentTime = timestamp;
@@ -218,6 +236,10 @@ function gameLoop(timestamp) {
 
 	food.forEach((f) => {
 		f.draw();
+	});
+
+	food.filter((f) => f.isEaten).forEach((f) => {
+		f.spawn();
 	});
 
 	requestAnimationFrame(gameLoop);
